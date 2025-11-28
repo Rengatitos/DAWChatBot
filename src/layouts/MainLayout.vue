@@ -1,23 +1,50 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+    <!-- Header -->
+    <q-header elevated class="bg-white text-primary">
       <q-toolbar>
-        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
+        <q-btn flat round dense icon="menu" @click="toggleDrawer" />
+        <q-toolbar-title>Onboarding TCS</q-toolbar-title>
 
-        <q-toolbar-title> Quasar App </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
+        <div v-if="auth.user" class="header-user">
+          <user-card :user="auth.user" />
+        </div>
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
+    <!-- Drawer -->
+    <q-drawer v-model="drawer" show-if-above bordered>
       <q-list>
-        <q-item-label header> Essential Links </q-item-label>
+        <q-item clickable v-ripple @click="go('/chat')">
+          <q-item-section avatar><q-icon name="chat" /></q-item-section>
+          <q-item-section>Chatbot</q-item-section>
+        </q-item>
 
-        <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" />
+        <q-item clickable v-ripple @click="go('/actividades')">
+          <q-item-section avatar><q-icon name="event" /></q-item-section>
+          <q-item-section>Actividades</q-item-section>
+        </q-item>
+
+        <q-item clickable v-ripple @click="go('/recursos')">
+          <q-item-section avatar><q-icon name="folder" /></q-item-section>
+          <q-item-section>Recursos</q-item-section>
+        </q-item>
+
+        <q-item clickable v-ripple @click="go('/perfil')">
+          <q-item-section avatar><q-icon name="person" /></q-item-section>
+          <q-item-section>Perfil</q-item-section>
+        </q-item>
+
+        <q-separator />
+
+        <q-item v-if="isAdmin" clickable v-ripple @click="go('/admin')">
+          <q-item-section avatar><q-icon name="dashboard" /></q-item-section>
+          <q-item-section>Admin Home</q-item-section>
+        </q-item>
       </q-list>
     </q-drawer>
 
+    <!-- Main Content -->
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -25,57 +52,34 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import EssentialLink from 'components/EssentialLink.vue'
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from 'src/stores/authStore'
+import UserCard from 'src/components/UserCard.vue'
 
-const linksList = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev',
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework',
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev',
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev',
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev',
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev',
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev',
-  },
-]
+const drawer = ref(false)
+const router = useRouter()
+const auth = useAuthStore()
 
-const leftDrawerOpen = ref(false)
-
-function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value
+function toggleDrawer() {
+  drawer.value = !drawer.value
 }
+function go(path) {
+  router.push(path)
+  drawer.value = false
+}
+
+const isAdmin = computed(() =>
+  auth.user &&
+  auth.user.rol &&
+  auth.user.rol.toLowerCase().includes('admin')
+)
 </script>
+
+<style scoped lang="scss">
+@import 'src/styles/palette.scss';
+
+.header-user {
+  margin-left: 12px;
+}
+</style>

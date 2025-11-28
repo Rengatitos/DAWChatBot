@@ -1,16 +1,20 @@
+// src/router/routes.js
 const routes = [
-  {
-    path: '/',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/IndexPage.vue') }],
-  },
+	{
+		path: '/',
+		component: () => import('src/layouts/MainLayout.vue'),
+		children: [
+			{ path: '', redirect: '/chat' },
+			{ path: 'chat', component: () => import('src/pages/ChatBotPage.vue'), name: 'chat' },
+			{ path: 'actividades', component: () => import('src/pages/ActividadesPage.vue'), name: 'actividades' },
+			{ path: 'recursos', component: () => import('src/pages/RecursosPage.vue'), name: 'recursos' },
+			{ path: 'perfil', component: () => import('src/pages/PerfilPage.vue'), name: 'perfil' },
+			{ path: 'admin', component: () => import('src/pages/AdminHomePage.vue'), name: 'admin' }
+		]
+	},
 
-  // Always leave this as last one,
-  // but you can also remove it
-  {
-    path: '/:catchAll(.*)*',
-    component: () => import('pages/ErrorNotFound.vue'),
-  },
+	// 404
+	{ path: '/:catchAll(.*)*', component: () => import('src/pages/ErrorNotFound.vue') }
 ]
 
 export default routes
